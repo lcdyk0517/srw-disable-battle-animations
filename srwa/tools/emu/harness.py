@@ -292,6 +292,28 @@ def handle(cmdline):
             g.bp(a, False)
         STATE["autobp"].clear()
         log("所有自动断点已撤除")
+    elif c == "pokeif2" and len(args) == 7:
+        # pokeif2 <addr1> <期望1> <addr2> <期望2> <写addr> <新半字> <超时秒> (7参)
+        a1, e1, a2, e2, wa, wv, tmo = (int(x,0) for x in args)
+        t0 = time.time(); done = False
+        while time.time() - t0 < tmo:
+            d1, d2 = g.read(a1, 2), g.read(a2, 2)
+            if d1 and d2 and struct.unpack("<H", d1)[0] == e1 and struct.unpack("<H", d2)[0] == e2:
+                g.write(wa, struct.pack("<H", wv)); done = True
+                break
+            time.sleep(0.1)
+        log("pokeif2: %s" % ("已写入@%.1fs" % (time.time()-t0) if done else "超时"))
+    elif c == "pokeif" and len(args) == 4:
+        # pokeif <addr> <期望半字hex> <新半字hex> <超时秒>: 轮询[addr]==期望即写新值
+        addr, exp, newv, tmo = int(args[0],0), int(args[1],0), int(args[2],0), int(args[3],0)
+        t0 = time.time(); done = False
+        while time.time() - t0 < tmo:
+            d = g.read(addr, 2)
+            if d and struct.unpack("<H", d)[0] == exp:
+                g.write(addr, struct.pack("<H", newv)); done = True
+                break
+            time.sleep(0.1)
+        log("pokeif %s==%x->%x: %s" % (hex(addr), exp, newv, "已写入@%.1fs" % (time.time()-t0) if done else "超时"))
     elif c == "c":
         g.cont()
         log("continue")
