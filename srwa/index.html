@@ -115,7 +115,7 @@ ti:"超级机器人大战A",su:"跳过动画补丁 v5",de:"浏览器端自动识
 d1:"拖放 GBA ROM 到此处，或<u>点击选择文件</u>",d2:"支持原版日文 / 汉化版 / RC修改版 / V1/V2/V3已打补丁 ROM",
 fn:"文件名",fs:"文件大小",dt:"识别结果",
 jp:"原版日文 ROM",cn:"WGF v1.1 汉化版",done:"已是V5",u:"未知 ROM",
-v1:"已打V1补丁",v2:"已打V2补丁",v3:"已打V3补丁",v0:"未打补丁",
+v1:"已打V1补丁",v2:"已打V2补丁",v3:"已打V3补丁",v0:"未打补丁",v4old:"已打V4补丁(可升级V5)",
 rjp:"检测到原版日文 ROM",rcn:"检测到 WGF v1.1 汉化版",rd:"已是最新版本 V5",ru:"未识别的 ROM",rc:"Red_Comet_x 修改版",le:"Leleu 汉化版",db:"盗版汉化版",
 pa:"战斗动画跳过",pad:"<b>V5</b> 确认界面START+A跳过/SELECT+A显示动画 · 修复OFF模式觉醒失效<br><b>V4</b> 确认界面R+A跳过/L+A显示动画<br><b>V1-V3</b> 菜单动画开关 · B键跳过 · 稳定性修复<br>制作: lcdyk · 测试: Lily",
 pad_up:"升级到V5：确认界面改START+A跳过/SELECT+A显示动画(L/R让位给援护) + 修复OFF模式觉醒追加行动失效",
@@ -126,18 +126,18 @@ en:"浏览器不支持 DecompressionStream",ec:"源文件 CRC 不匹配",eo:"输
 ti:"スーパーロボット大戦A",su:"アニメスキップパッチ v5",de:"ブラウザでROM自動認識 · ワンクリックパッチ",
 d1:"GBA ROMをドロップ、または<u>クリックして選択</u>",d2:"オリジナル日本語 / 中国語翻訳版 / RC修改版 / V1/V2/V3適用済ROM対応",
 fn:"ファイル名",fs:"ファイルサイズ",dt:"認識結果",
-jp:"オリジナル日本語ROM",cn:"WGF v1.1 中国語翻訳版",done:"V4適用済(更新可)",u:"不明なROM",
-v1:"V1適用済",v2:"V2適用済",v3:"V3適用済",v0:"パッチ未適用",
+jp:"オリジナル日本語ROM",cn:"WGF v1.1 中国語翻訳版",done:"V5適用済",u:"不明なROM",
+v1:"V1適用済",v2:"V2適用済",v3:"V3適用済",v0:"パッチ未適用",v4old:"V4適用済(V5へ更新可)",
 rjp:"オリジナル日本語ROMを検出",rcn:"WGF v1.1 中国語翻訳版を検出",rd:"最新バージョン V5です",ru:"未認識のROM",rc:"Red_Comet_x修改版",le:"Leleu 翻訳版",db:"海賊版翻訳",
 pa:"戦闘アニメスキップ",pad:"<b>V5</b> START+Aスキップ/SELECT+Aアニメ表示 · OFF時覚醒バグ修正<br><b>V4</b> R+Aスキップ/L+A表示<br><b>V1-V3</b> メニュー切替 · Bスキップ<br>制作: lcdyk · テスト: Lily",
-pad_up:"V4アップグレード: 確認画面R+Aスキップ/L+Aアニメ表示",
+pad_up:"V5へアップグレード: START+Aスキップ/SELECT+Aアニメ表示(L/Rは援護操作へ) + OFF時覚醒バグ修正",
 ap:"パッチ適用",dl:"ROMダウンロード",
 lc:"CRC検証通過",ld:"パッチ解凍中...",lx:"XOR復元中...",ln:"パッチ適用完了！",ll:"ダウンロード開始",
 en:"ブラウザが非対応です (Chrome 80+等)",ec:"ソースCRC不一致",eo:"出力CRC検証失敗"
 }};
 let lg='zh',S=null,SP=null,TB=null;
 const $=id=>document.getElementById(id),t=k=>L[lg][k]||k;
-function sl(l){lg=l;document.querySelectorAll('[data-i]').forEach(e=>{const k=e.getAttribute('data-i');if(L[l][k])e.innerHTML=L[l][k]});document.querySelectorAll('.lsw button').forEach(b=>b.classList.remove('on'));$('b'+l[0]).classList.add('on');document.title=l==='ja'?'SRW-A アニメスキップパッチ v4':'SRW-A 跳过动画补丁 v4';if(window._db)updVd();if(window._rk)showRes(window._rk)}
+function sl(l){lg=l;document.querySelectorAll('[data-i]').forEach(e=>{const k=e.getAttribute('data-i');if(L[l][k])e.innerHTML=L[l][k]});document.querySelectorAll('.lsw button').forEach(b=>b.classList.remove('on'));$('b'+l[0]).classList.add('on');document.title=l==='ja'?'SRW-A アニメスキップパッチ v5':'SRW-A 跳过动画补丁 v5';if(window._db)updVd();if(window._rk)showRes(window._rk)}
 function updVd(){const db=window._db;if(!db)return;
 if(db.v==="done")$("vd").textContent=t(db.t)+" · "+t("done");
 else if(db.v==="v5")$("vd").textContent=t(db.t)+" · "+t("v0");

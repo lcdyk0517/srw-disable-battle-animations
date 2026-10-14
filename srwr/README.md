@@ -2,7 +2,8 @@
 
 > 目标：战斗动画播放中按 **B** 跳过动画，直接进入结算。
 > 状态：**V1 已交付并实测通过**（2026-10-07，星组汉化版 + 震动版 + 官方日文版三ROM）。
-> 姊妹篇：`超级机器人大战A_逆向解析笔记.md`（A引擎，与R引擎代码重叠仅约3%，完全是两套系统）。
+> 在线补丁页：<https://srw.cc.cd/srwr>（浏览器端自动识别 ROM · 一键打补丁）。
+> 姊妹篇：[../srwa/README.md](../srwa/README.md)（超级机器人大战A逆向解析笔记，A引擎与R引擎代码重叠仅约3%，完全是两套系统）。
 
 ---
 
@@ -10,13 +11,10 @@
 
 | 文件 | 说明 |
 |---|---|
-| `机战R_动画跳过_V1.gba` | 星组汉化版 + V1补丁（md5 49e95790） |
-| `机战R_动画跳过_V1_震动版.gba` | 震动版 + V1补丁（md5 e0a772b9） |
-| `机战R_动画跳过_V1_日文版.gba` | 官方日文原版 + V1补丁（md5 4818b4ee） |
-| `emu/build_rom_r.py` | V1 唯一可信构建源（三ROM，capstone全量自验） |
-| `tools/build存档/build_rom_R_V1_星组+震动+日文版.py` | V1 历史存档 |
-| `patch_r.html` | 浏览器端补丁工具（仿 patch.html，XDF1格式） |
-| `emu/patch_r_data.json` | 补丁包数据（CRC/base64） |
+| `index.html` | 在线补丁工具（XDF1格式，补丁数据内嵌；即历史的 patch_r.html + patch_r_data.json 合并定版） |
+| `build_rom/build_rom.py` | V1 唯一可信构建源（三ROM，capstone全量自验） |
+| `tools/emu/` | 调试环境（mGBA GDB测试台 harness.py / disasm_tool.py） |
+| V1交付ROM（已分发） | 星组汉化版+V1（md5 49e95790）/ 震动版+V1（md5 e0a772b9）/ 日文原版+V1（md5 4818b4ee） |
 
 三版 ROM 引擎代码**逐字节一致**（差异只在字库/尾部数据），同一份补丁字节通吃：
 - 星组: 9034688B, CRC32 `68676832` → 打补丁后 `AA577351`
@@ -143,7 +141,7 @@ bx r1
 
 ## 5. 调试环境速查
 
-- `emu/harness.py serve srwr_bskip.gba run_r` — 测试台（自编译mGBA GDB版），命令队列 `q/cmd.txt` → 日志 `log/out.txt`，断点事件 `log/events.txt`
+- `tools/emu/harness.py serve srwr_bskip.gba run_r` — 测试台（自编译mGBA GDB版），命令队列 `q/cmd.txt` → 日志 `log/out.txt`，断点事件 `log/events.txt`
 - `bpa <addr> <标签>` 自动断点（记r0-r3/lr）；**低频断点安全，每帧断点=冻屏**
 - **wp 观察点可用**（`wp <addr> <len>`，写命中记pc）——抓"谁写了这个变量"神器
 - `key <键名>` PostMessage注入；`shot <png>` 截图；`pokeif` 条件写内存
@@ -162,10 +160,10 @@ bx r1
 
 ## 6. 构建/补丁工具链
 
-- `build_rom_r.py`：双ROM构建，capstone全量自验（指令序列+**操作数方向断言**+分支目标+每条ldr池值核对+站点bl+回读），`--dry`空跑
+- `build_rom/build_rom.py`：三ROM构建，capstone全量自验（指令序列+**操作数方向断言**+分支目标+每条ldr池值核对+站点bl+回读），`--dry`空跑
 - 手写Thumb教训：strb操作数方向写反过一次（0x7011↔0x700A），全靠操作数级断言抓住；b_enc/ldrpc_enc第一参数必须是实际发射地址
 - BL扫描器坑：Thumb BL偏移是**23位符号扩展（bit22=0x400000）**，写错符号位会漏掉所有负偏移调用点（本项目踩过：0x8002AAC/0x8000F04/0x8014E14的调用者全在更高地址）
-- `patch_r.html`：XDF1格式（`"XDF1"+源CRC+目标CRC+输出大小+压缩大小+deflate-raw(XOR差异)`的base64），DecompressionStream解压，CRC32双向校验；已浏览器端到端实测（识别/打补丁/已打版提示/震动版全通过）
+- `index.html`（原patch_r.html）：XDF1格式（`"XDF1"+源CRC+目标CRC+输出大小+压缩大小+deflate-raw(XOR差异)`的base64），DecompressionStream解压，CRC32双向校验；已浏览器端到端实测（识别/打补丁/已打版提示/震动版全通过）
 - 补丁生成：`zlib.compress(xd,9)[2:-4]` 剥掉zlib头尾即 deflate-raw
 
 ---
