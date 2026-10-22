@@ -11,6 +11,7 @@ Battle animation skip patches for the **Super Robot Wars** series (スーパー�
 |---|---|---|
 | Super Robot Wars A (GBA) · 超级机器人大战A | V5 (2026-10-13) | **<https://srw.cc.cd/srwa>** |
 | Super Robot Wars R (GBA) · 超级机器人大战R | V1 (2026-10-07) | **<https://srw.cc.cd/srwr>** |
+| Super Robot Wars Compact 2 (WonderSwan) · 超级机器人大战COMPACT 2 | V1 (2026-10-22) | **<https://srw.cc.cd/compact2>** |
 
 *This catalog keeps growing — more titles will be added.*
 *收录持续扩充中，更多作品陆续添加。*
@@ -20,7 +21,7 @@ Battle animation skip patches for the **Super Robot Wars** series (スーパー�
 ## How to use / 使用方法
 
 1. Open the patch page of your game / 打开对应游戏的补丁页
-2. Drop your GBA ROM onto the page (or click to choose a file) / 把 GBA ROM 拖入页面（或点击选择文件）
+2. Drop your ROM (GBA or WonderSwan) onto the page (or click to choose a file) / 把 ROM（GBA / WonderSwan）拖入页面（或点击选择文件）
 3. The ROM is identified automatically by CRC32 — ROMs with older patches already applied are recognized and upgraded too / 页面按 CRC32 自动识别 ROM；已打过旧版补丁的 ROM 同样能识别并引导升级
 4. Click **Apply patch**, then download the patched ROM / 点「应用补丁」，下载打好补丁的 ROM
 
@@ -117,6 +118,49 @@ Full reverse-engineering notes / 完整逆向解析笔记: [srwr/README.md](srwr
 
 ---
 
+## Super Robot Wars Compact 2 (WonderSwan) · 超级机器人大战COMPACT 2 — V1
+
+**Patch page / 补丁页**: <https://srw.cc.cd/compact2> · **Patch notes / 补丁说明**: [compact2/README.md](compact2/README.md)
+
+Covers the three-part game — Part 1 *Chijou Gekidou Hen*, Part 2 *Uchuu Gekishin Hen*, Part 3 *Ginga Kessen Hen* — in Japanese and Chinese fan translations, six versions in total (4 MB `.ws` / `.wsc`).
+覆盖三部曲全部作品：第1部·地上激動編 / 第2部·宇宙激震編 / 第3部·銀河決戦篇，日版与汉化版共 6 个版本（4MB `.ws` / `.wsc`）。
+
+### Features / 功能
+
+**English**
+
+- New 6th entry `ON/OFF` in the system menu, rendered with the game's own native font (height and spacing match the other entries)
+- ON: battle animations play normally; hold **B** during an animation to end it right away and go into settlement
+- OFF: all battle animations are skipped by default — battle goes straight to settlement and back to the map
+- Press **A** on the 6th entry to toggle and close the menu cleanly; press **B** to close without toggling
+- The toggle state is kept in RAM: reopening the menu shows the current state, and no ON/OFF glyphs leak into other menus
+
+**中文**
+
+- 系统菜单第 6 项显示原生 `ON / OFF`（用游戏原生字体渲染，字高字距与其他项一致）
+- ON：战斗动画正常播放；动画中按住 **B** 立即结束当前动画进入结算
+- OFF：默认跳过全部战斗动画，直接结算并回到地图
+- 第 6 项按 **A**：切换 ON/OFF 并干净关闭菜单；按 **B**：只关闭菜单，不切换
+- 开关状态保存在 RAM：重开菜单显示当前状态，其他菜单不会出现 ON/OFF 字形残留
+
+### Supported ROMs / 支持的 ROM（CRC32: original → patched / 原版 → 打补丁后）
+
+| ROM | Original | Patched (V1) |
+|---|---|---|
+| Part 1 Japanese · 日版第1部 `Compact_2_1 Rev1` | 782877BC | B90AEDEF |
+| Part 2 Japanese · 日版第2部 `Compact_2_2 Rev4` | ECBB46DE | 4F7EC0DE |
+| Part 3 Japanese · 日版第3部 `Compact_2_3 Rev2` | 0B0F8981 | 0BEB9A34 |
+| Part 1 Chinese · 汉化版「地上激震篇 名称修复版」 | 11DDBB87 | CAED1842 |
+| Part 2 Chinese · 汉化版「宇宙激震篇 名称剧情补全版」 | 75AFC3F0 | 1D0C06C7 |
+| Part 3 Chinese · 汉化版「银河决战篇 V1.3汉化版」 | 42BEFC0E | 425AEFBB |
+
+The page identifies ROMs by CRC32; ROMs already patched (output CRC) are recognized as "already patched" and never written twice.
+页面按 CRC32 自动识别；已是输出 CRC 的 ROM 会被识别为“已打补丁”，不会重复写入。
+
+Full patch notes (address tables for both engine families, verification) / 完整补丁说明（两个引擎家族的地址表、校验）: [compact2/README.md](compact2/README.md)
+
+---
+
 ## Repository / 仓库结构
 
 ```
@@ -127,11 +171,15 @@ Full reverse-engineering notes / 完整逆向解析笔记: [srwr/README.md](srwr
 │   ├── README.md    reverse-engineering notes V5 / 逆向解析笔记 V5
 │   ├── build_rom/   local build scripts build_rom_{cn,jp,rc,le,db}_v1…v5.py (capstone-verified) / 本地构建脚本
 │   └── tools/emu/   debugging environment: mGBA GDB harness / 调试环境
-└── srwr/            Super Robot Wars R · 超级机器人大战R
-    ├── index.html   online patcher (XDF1 diff format) / 在线补丁工具
-    ├── README.md    reverse-engineering notes V1 / 逆向解析笔记 V1
-    ├── build_rom/   build_rom.py (3-ROM build + self-check) / 构建脚本
-    └── tools/emu/   same as above / 同上
+├── srwr/            Super Robot Wars R · 超级机器人大战R
+│   ├── index.html   online patcher (XDF1 diff format) / 在线补丁工具
+│   ├── README.md    reverse-engineering notes V1 / 逆向解析笔记 V1
+│   ├── build_rom/   build_rom.py (3-ROM build + self-check) / 构建脚本
+│   └── tools/emu/   same as above / 同上
+└── compact2/        Super Robot Wars Compact 2 · 超级机器人大战COMPACT 2 (WonderSwan)
+    ├── index.html   online patcher (6 versions, zh/ja UI) / 在线补丁工具
+    ├── README.md    patch notes V1 (both engine families) / 补丁说明 V1
+    └── build_rom/   build_rom.py (6-ROM build, MD5-identified) / 构建脚本
 ```
 
 Each game lives in its own folder; new titles are added as new folders and a row in the catalog above.
