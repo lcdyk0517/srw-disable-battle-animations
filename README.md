@@ -11,6 +11,7 @@ Battle animation skip patches for the **Super Robot Wars** series (スーパー�
 |---|---|---|
 | Super Robot Wars A (GBA) · 超级机器人大战A | V5 (2026-10-13) | **<https://srw.cc.cd/srwa>** |
 | Super Robot Wars R (GBA) · 超级机器人大战R | V1 (2026-10-07) | **<https://srw.cc.cd/srwr>** |
+| Super Robot Wars Compact 1 (WonderSwan) · 超级机器人大战COMPACT 1 | V1 (2026-10-22) | **<https://srw.cc.cd/compact1>** |
 | Super Robot Wars Compact 2 (WonderSwan) · 超级机器人大战COMPACT 2 | V1 (2026-10-22) | **<https://srw.cc.cd/compact2>** |
 
 *This catalog keeps growing — more titles will be added.*
@@ -118,6 +119,48 @@ Full reverse-engineering notes / 完整逆向解析笔记: [srwr/README.md](srwr
 
 ---
 
+## Super Robot Wars Compact 1 (WonderSwan) · 超级机器人大战COMPACT 1 — V1
+
+**Patch page / 补丁页**: <https://srw.cc.cd/compact1> · **Patch notes / 补丁说明**: [compact1/README.md](compact1/README.md)
+
+The original *Compact*: Japanese Rev 2, the Chinese fan translation 0.91, and the WonderSwan Color re-release — three versions (2 MB `.ws` / 4 MB `.wsc`).
+初代《COMPACT》：日版 Rev 2、简体汉化 0.91 与 WonderSwan Color 版，共 3 个版本（2MB `.ws` / 4MB `.wsc`）。
+
+### Features / 功能
+
+**English**
+
+- New 6th entry in the system menu: native `ON/OFF` in the Japanese versions (the WSC one shows オン/オフ), and `动画ON/动画OFF` in the Chinese translation
+- ON: battle animations play normally; hold **B** during an animation to end it right away into settlement
+- OFF: battle animations are skipped entirely — settlement runs through the game's native flow straight back to the map
+- Press **A** on the 6th entry to toggle; press **B** to close the menu without toggling
+- Toggle state is kept in RAM; no ON/OFF glyphs leak into other menus
+
+**中文**
+
+- 系统菜单新增第 6 项：两个日版为原生 `ON/OFF`（WSC 版显示 オン/オフ），汉化版为 `动画ON/动画OFF`
+- ON：战斗动画正常播放；动画中按住 **B** 立即结束动画进入结算
+- OFF：完全不进入战斗动画，按原版结算流程直接回地图
+- 菜单第 6 项按 **A** 切换，按 **B** 只关闭菜单不切换
+- 开关状态保存在 RAM；其他菜单不会残留 ON/OFF 字形
+
+> Chinese-translation code table courtesy of **断空零** ([bilibili](https://space.bilibili.com/3747501796494245)). / 感谢 **断空零** 提供码表。
+
+### Supported ROMs / 支持的 ROM（CRC32: original → patched / 原版 → 打补丁后）
+
+| ROM | Original | Patched (V1) |
+|---|---|---|
+| Japanese Rev 2 (2MB WS) · 日版 Rev2 | 7021D54F | D025E529 |
+| Chinese 0.91 (2MB WS) · 汉化版 0.91 | 80CD2F14 | 4BCE3EA0 |
+| WonderSwan Color Japanese (4MB) · WSC 日版 | 16E0D929 | B85158D3 |
+
+The WSC version's battle animation runs in two stages and gets a dedicated pre-skip; a dialog box overlapping the animation during its first second is an original-game issue, not introduced by the patch.
+WSC 版战斗动画分两段，补丁做了专门的预跳过；战斗动画开始约 1 秒内对话框可能覆盖在动画上，这是原版自身的问题，不是补丁引入。
+
+Full patch notes / 完整补丁说明: [compact1/README.md](compact1/README.md)
+
+---
+
 ## Super Robot Wars Compact 2 (WonderSwan) · 超级机器人大战COMPACT 2 — V1
 
 **Patch page / 补丁页**: <https://srw.cc.cd/compact2> · **Patch notes / 补丁说明**: [compact2/README.md](compact2/README.md)
@@ -176,6 +219,10 @@ Full patch notes (address tables for both engine families, verification) / 完�
 │   ├── README.md    reverse-engineering notes V1 / 逆向解析笔记 V1
 │   ├── build_rom/   build_rom.py (3-ROM build + self-check) / 构建脚本
 │   └── tools/emu/   same as above / 同上
+├── compact1/        Super Robot Wars Compact 1 · 超级机器人大战COMPACT 1 (WonderSwan)
+│   ├── index.html   online patcher (3 versions, zh/ja UI) / 在线补丁工具
+│   ├── README.md    patch notes V1 / 补丁说明 V1
+│   └── build_rom/   build_rom.py (3-ROM build, MD5-verified) / 构建脚本
 └── compact2/        Super Robot Wars Compact 2 · 超级机器人大战COMPACT 2 (WonderSwan)
     ├── index.html   online patcher (6 versions, zh/ja UI) / 在线补丁工具
     ├── README.md    patch notes V1 (both engine families) / 补丁说明 V1

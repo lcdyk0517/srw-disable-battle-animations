@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SRW Compact 1 跳过动画补丁 V1</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a1a;--card:rgba(18,18,40,0.95);--border:rgba(255,255,255,0.06);--ac:#e63946;--ac2:#ffd166;--gn:#06d6a0;--tx:#e8e8f0;--dm:#7a7a9a}
+body{font-family:'Segoe UI','Hiragino Sans',system-ui,sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;color:var(--tx);overflow-x:hidden}
+body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 20%,rgba(230,57,70,0.07) 0%,transparent 50%),radial-gradient(circle at 70% 80%,rgba(255,209,102,0.05) 0%,transparent 50%);pointer-events:none}
+.wrap{width:100%;max-width:520px;padding:20px;position:relative;z-index:1}
+.card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:32px 28px;backdrop-filter:blur(20px);box-shadow:0 30px 80px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.04)}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.logo{display:flex;align-items:center;gap:10px;min-width:0}
+.li{width:38px;height:38px;background:linear-gradient(135deg,var(--ac),#c1121f);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
+.lt{font-size:11px;color:var(--dm);line-height:1.4;min-width:0}.lt b{display:block;font-size:14px;color:var(--tx);font-weight:700;white-space:nowrap}
+.lsw{display:flex;background:rgba(255,255,255,0.04);border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.07)}
+.lsw button{background:none;border:none;color:var(--dm);padding:6px 14px;font-size:12px;cursor:pointer;transition:all 0.2s;font-family:inherit}
+.lsw button.on{background:var(--ac);color:#fff}
+.repo{margin-bottom:20px;display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;font-size:12px;color:var(--dm);text-decoration:none;transition:all 0.2s}
+.repo:hover{border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.05)}
+.repo svg{width:16px;height:16px;fill:var(--dm);flex-shrink:0}
+.repo span{color:var(--tx);font-weight:600}
+.sub{font-size:12px;color:var(--dm);text-align:center;margin-bottom:14px;letter-spacing:0.3px}
+.drop{border:2px dashed rgba(255,255,255,0.1);border-radius:16px;padding:30px 20px;text-align:center;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden}
+.drop:hover,.drop.over{border-color:var(--ac);background:rgba(230,57,70,0.03)}
+.drop .ic{font-size:28px;margin-bottom:6px;opacity:0.7}.drop p{color:var(--dm);font-size:13px}.drop p u{color:var(--ac);text-decoration:underline}.drop .sm{font-size:10.5px;color:rgba(255,255,255,0.32);margin-top:6px;line-height:1.8}
+.info{margin-top:14px;display:none}
+.ib{background:rgba(0,0,0,0.3);border-radius:12px;padding:12px 14px;font-size:12px;font-family:'SF Mono',Consolas,monospace}
+.ir{display:flex;justify-content:space-between;padding:3px 0;gap:12px}.ir .l{color:var(--dm);flex-shrink:0}.ir .v{color:var(--gn);font-weight:600;text-align:right;word-break:break-all}.ir .v.r{color:var(--ac)}.ir .v.y{color:var(--ac2)}
+.res{margin-top:14px;display:none;padding:15px;border-radius:12px;animation:fi 0.3s}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.res.ok{background:rgba(6,214,160,0.06);border:1px solid rgba(6,214,160,0.15)}
+.res.wa{background:rgba(255,209,102,0.06);border:1px solid rgba(255,209,102,0.15)}
+.res.er{background:rgba(230,57,70,0.06);border:1px solid rgba(230,57,70,0.15)}
+.res h3{font-size:14px;margin-bottom:6px}.res p{font-size:12px;color:var(--dm);line-height:1.6}
+.selbox{margin-top:12px;display:none;background:rgba(230,57,70,0.08);border:1px solid rgba(230,57,70,0.2);border-radius:10px;padding:11px 13px;font-size:12px;line-height:1.7;word-break:break-all}
+.selbox b{color:var(--ac);font-size:13px}.selbox span{color:var(--dm);font-size:11px}.selbox code{color:var(--ac2);font-family:'SF Mono',Consolas,monospace;font-size:11px}
+.pw{margin-top:14px;display:none}.pb{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}.pf{height:100%;width:0;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:2px;transition:width 0.3s}
+.pt{font-size:11px;color:var(--dm);margin-top:5px;display:flex;justify-content:space-between}
+.btns{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.btn{padding:13px;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.25s;font-family:inherit}
+.btn:disabled{opacity:0.2;cursor:not-allowed}
+.bp{background:linear-gradient(135deg,var(--ac),#c1121f);color:#fff;box-shadow:0 4px 20px rgba(230,57,70,0.25)}
+.bp:not(:disabled):hover{transform:translateY(-1px);box-shadow:0 8px 30px rgba(230,57,70,0.35)}
+.bs{background:rgba(255,255,255,0.05);color:var(--tx);border:1px solid rgba(255,255,255,0.08)}
+.bs:not(:disabled):hover{background:rgba(255,255,255,0.09);transform:translateY(-1px)}
+.lg{margin-top:14px;max-height:130px;overflow-y:auto;background:rgba(0,0,0,0.35);border-radius:10px;padding:12px;font-family:'SF Mono',Consolas,monospace;font-size:11px;line-height:1.6;display:none}
+.lg .ok{color:var(--gn)}.lg .er{color:var(--ac)}.lg .ii{color:var(--dm)}
+.ft{margin-top:18px;text-align:center;font-size:10px;color:rgba(255,255,255,0.15);letter-spacing:0.3px}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="card">
+<div class="top">
+ <div class="logo"><div class="li">C1</div><div class="lt"><b data-i="ti">超级机器人大战 Compact 1</b><span data-i="su">跳过动画补丁 V1</span></div></div>
+ <div class="lsw"><button onclick="sl('zh')" id="bz" class="on">中文</button><button onclick="sl('ja')" id="bj">日本語</button></div>
+</div>
+<a class="repo" href="https://github.com/lcdyk0517/srw-disable-battle-animations" target="_blank" rel="noopener">
+<svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+<span>lcdyk0517/srw-disable-battle-animations</span>
+</a>
+<div class="sub" data-i="de">浏览器端自动识别 ROM · 一键打补丁</div>
+<div class="drop" id="dz"><div class="ic">🎮</div><p data-i="d1">拖放 WonderSwan Color ROM 到此处，或<u>点击选择文件</u></p><p class="sm" data-i="d2">支持日版 / 汉化版共 6 个版本（4MB .ws / .wsc）</p><input type="file" id="fi" accept=".ws,.wsc" style="position:absolute;opacity:0;width:100%;height:100%;cursor:pointer"></div>
+<div class="info" id="ni"><div class="ib">
+<div class="ir"><span class="l" data-i="fn">文件名</span><span class="v" id="vn">-</span></div>
+<div class="ir"><span class="l" data-i="fs">文件大小</span><span class="v" id="vs">-</span></div>
+<div class="ir"><span class="l" data-i="crc">CRC32</span><span class="v" id="vcrc">-</span></div>
+<div class="ir"><span class="l" data-i="dt">识别结果</span><span class="v" id="vd">-</span></div>
+</div></div>
+<div class="res" id="re"></div>
+<div class="selbox" id="selbox"></div>
+<div class="pw" id="pw"><div class="pb"><div class="pf" id="pf"></div></div><div class="pt"><span id="pt">-</span><span id="pp">0%</span></div></div>
+<div class="btns"><button class="btn bp" id="ap" disabled data-i="ap">应用补丁</button><button class="btn bs" id="dl" style="display:none" data-i="dl">下载 ROM</button></div>
+<div class="lg" id="lg"></div>
+<div class="ft">lcdyk · SRW-C1 Patch Tool V1 · XOR + Deflate · CRC32</div>
+</div></div>
+<script>
+const V={"1j":{"ci":1881265487,"co":3492144425,"label":"Compact_1 Rev2 日版","part":"日版 Rev 2（2MB WS）","out":"Super Robot Taisen Compact (Japan) (Rev 2)(Skip).ws","d":"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"},"1h":{"ci":2160930580,"co":1271807648,"label":"Compact_1 CN 0.91 汉化版","part":"简体中文 0.91（2MB WS）","out":"超级机器人大战COMPACT_CN_0.91_跳过动画.ws","d":"WERGMRQvzYCgPs5LAAAgAAUKAADt1M1rHVUUAPBpoV+rt7EFcdGF3RQKpfgWcSFuxNBCK27qJrR08aBbC26sbaLLERdS2oLZpFjQQspb6U7CU1ocEsiyH4h9/gElBpPMm/fmzXFiFJpCFdoQk/L7XbiXuXOGO+ecYZIEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGBrioiJmLp9u14bcbTd3uzz66OnZiZi9eijC42F0BEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANg05/9IplQBAAAAAAAAAAAAAAAAAAAAAAAAAACAbWenEgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAG2TqxlPXt26tu969c8/J7ZpbIzk3q8MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwHNbicUY5P11o8h7efX4yZHXO/H4yZGvi/ln599iqg2KeZGzVvLldWMp9wUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGxBv0zMX+opAwAAAAAAAAAAAAAAAAD/4dGhhiIAAAAAAAAAAAAAAABsiPdmXj3x2okP8nQl+6RzJY8D3x870D6mLgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAm+9UqgYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDzevTWEUUAAIAtbPru0huLE+oAAAAAAAAAvCyy8c7kcCmdzi53vihPl+l39calskh/qNeLZT+9k41n0atGB9E6WETjnZh9N+J4nKxa769Eo7W4XE9X7kW7ted+tLPLD14fJr9nbxaTw2Ez+2jwMIn+fGRjF8pspLhWRmQ76lvNTcnst6vRrZOYq/ppN9tX1EmkC9ne4scq8rQ33vmpyj/v1W/1aV6/1XjnszzSorv/y2/jYHf/4Xre/p1dy7lXd2OuWmj+tQzqeba6WKf9c5Uk39wcnTsy3W6+nF/2av9b1yPaZz4u+2fLscFwrBiOFMvDiJHiq7KK0Zgfu1F++PZI8XXZTlq7fl0LjcGzQ/+uab76yHzySrG6zqw92m36mQAAAP+TPwE="},"1c":{"ci":383834409,"co":3092338899,"label":"Compact_1 WSC 日版","part":"WonderSwan Color 日版（4MB WSC）","out":"Super Robot Taisen Compact for WonderSwan Color (Japan)(Skip).wsc","d":"WERGMSnZ4BbTWFG4AABAAGoSAADs0r1rVmcUAPBLBjFDzSJZhf4DXTJEEMQsrtqlS8gW6FRrDBFReBG3+y46SOlW+mGHDjq2Y5IOPi7BUgeHUgVBcEgImDzvTd73Od54LSRDHSqNiL/fw72He55zPzjnVhUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA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"}};
+const DB=[];
+for(const k in V){DB.push({c:V[k].ci,k:k,s:'src'});DB.push({c:V[k].co,k:k,s:'dst'});}
+let S=null,SP=null,TB=null,lg='zh',_rk=null;
+const $=id=>document.getElementById(id);
+const L={
+ zh:{
+  ti:'超级机器人大战 Compact 1',su:'跳过动画补丁 V1',
+  de:'浏览器端自动识别 ROM · 一键打补丁',
+  pa:'战斗动画跳过 V1',
+  pad:'系统菜单第 6 项 ON/OFF：ON=正常播放动画，播放中按 B 结束；OFF=默认跳过全部战斗动画，直接结算。<br>制作：lcdyk',
+  cr:'感谢<a href="https://space.bilibili.com/3747501796494245" target="_blank" rel="noopener" style="color:var(--ac2)">断空零</a>提供码表',
+  d1:'拖放 WonderSwan / WonderSwan Color ROM 到此处，或<u>点击选择文件</u>',
+  d2:'支持日版 / 汉化版共 3 个版本（2MB .ws / 4MB .wsc）<br>Compact_1 Rev2 日版 · Compact_1 CN 0.91 汉化版<br>Compact_1 WSC 日版',
+  fn:'文件名',fs:'文件大小',crc:'CRC32',dt:'识别结果',
+  ap:'应用补丁',dl:'下载 ROM',
+  out:'输出文件名：',
+  ready:'准备应用补丁',
+  already:'✨ 这个 ROM 已经是跳过动画 V1 版',
+  unk:'⚠️ 未识别的 ROM',
+  unkSub:'仅支持上方列出的 3 个版本（2MB .ws 或 4MB .wsc）。',
+  unknown:'未知 ROM',src:'待打补丁',dst:'已打补丁',
+  apply:'▶ 应用补丁',read:'读取补丁...',crcok:'源 CRC32 校验通过',
+  unpack:'补丁解压: ',write:'写入 ROM...',ocrc:'输出 CRC32: ',omd5:'输出 MD5: ',
+  done:'完成',okmsg:'✓ 补丁应用成功',fail:'失败',dld:'✓ 已下载',
+  noinf:'当前浏览器不支持 DecompressionStream（请用新版 Chrome / Edge）',
+  badfmt:'补丁格式错误',badcrc:'源 ROM CRC32 不匹配',badout:'输出 CRC32 校验失败'
+ },
+ ja:{
+  ti:'スーパーロボット大戦コンパクト',su:'アニメスキップパッチ V1',
+  de:'ブラウザでROM自動判別 · ワンクリック適用',
+  pa:'戦闘アニメスキップ V1',
+  pad:'システムメニュー6番目 ON/OFF：ON=通常アニメ再生、再生中にBで終了；OFF=全戦闘アニメをデフォルトでスキップして即決済。<br>制作：lcdyk',
+  cr:'コード表提供：<a href="https://space.bilibili.com/3747501796494245" target="_blank" rel="noopener" style="color:var(--ac2)">断空零</a>',
+  d1:'WonderSwan / WonderSwan Color ROMをドラッグ、または<u>クリックで選択</u>',
+  d2:'日本語版 / 中国語版 全3バージョン対応（2MB .ws / 4MB .wsc）<br>Compact_1 Rev2 日本語版 · Compact_1 CN 0.91 中国語版<br>Compact_1 WSC 日本語版',
+  fn:'ファイル名',fs:'サイズ',crc:'CRC32',dt:'判定結果',
+  ap:'パッチ適用',dl:'ROMをダウンロード',
+  out:'出力ファイル名：',
+  ready:'パッチ適用の準備',
+  already:'✨ この ROM は既にアニメスキップ V1 版です',
+  unk:'⚠️ 未対応の ROM',
+  unkSub:'上記の3バージョンのみ対応（2MB .ws または 4MB .wsc）。',
+  unknown:'不明な ROM',src:'パッチ未適用',dst:'パッチ適用済み',
+  apply:'▶ パッチ適用',read:'パッチ読み込み...',crcok:'ソース CRC32 一致',
+  unpack:'パッチ展開: ',write:'ROM書き込み...',ocrc:'出力 CRC32: ',omd5:'出力 MD5: ',
+  done:'完了',okmsg:'✓ パッチ適用成功',fail:'失敗',dld:'✓ ダウンロード完了',
+  noinf:'お使いのブラウザは DecompressionStream 非対応です（最新の Chrome / Edge を使用してください）',
+  badfmt:'パッチ形式が不正です',badcrc:'ソース ROM の CRC32 が一致しません',badout:'出力 CRC32 検証失敗'
+ }
+};
+const TN=k=>V[k].label;
+const log=(m,c='ii')=>{const e=$('lg');e.style.display='block';e.innerHTML+='<div class="'+c+'">'+m+'</div>';e.scrollTop=e.scrollHeight};
+const sp=(p,tx)=>{$('pw').style.display='block';$('pf').style.width=p+'%';$('pt').textContent=tx;$('pp').textContent=p+'%'};
+const ct=new Uint32Array(256);for(let i=0;i<256;i++){let c=i;for(let j=0;j<8;j++)c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);ct[i]=c}
+function crc32(b){let c=0xFFFFFFFF;const u=new Uint8Array(b);for(let i=0;i<u.length;i++)c=ct[(c^u[i])&0xFF]^(c>>>8);return(c^0xFFFFFFFF)>>>0}
+const MS=[7,12,17,22,7,12,17,22,7,12,17,22,7,12,17,22,5,9,14,20,5,9,14,20,5,9,14,20,5,9,14,20,4,11,16,23,4,11,16,23,4,11,16,23,4,11,16,23,6,10,15,21,6,10,15,21,6,10,15,21,6,10,15,21];
+const MK=new Uint32Array(64);for(let i=0;i<64;i++)MK[i]=Math.floor(Math.abs(Math.sin(i+1))*4294967296)>>>0;
+function md5hex(u8){
+ const n=u8.length,pl=((((n+8)>>6)+1)<<6),p=new Uint8Array(pl);p.set(u8);p[n]=0x80;
+ const dv=new DataView(p.buffer);dv.setUint32(pl-8,(n*8)>>>0,true);dv.setUint32(pl-4,Math.floor(n/0x20000000),true);
+ let a0=0x67452301,b0=0xefcdab89,c0=0x98badcfe,d0=0x10325476;
+ for(let off=0;off<pl;off+=64){
+  const M=new Uint32Array(p.buffer,off,16);let A=a0,B=b0,C=c0,D=d0;
+  for(let i=0;i<64;i++){
+   let F,g;
+   if(i<16){F=(B&C)|(~B&D);g=i}
+   else if(i<32){F=(D&B)|(~D&C);g=(5*i+1)%16}
+   else if(i<48){F=B^C^D;g=(3*i+5)%16}
+   else{F=C^(B|~D);g=(7*i)%16}
+   const sum=(A+(F>>>0)+MK[i]+M[g])>>>0,rot=((sum<<MS[i])|(sum>>>(32-MS[i])))>>>0;
+   const tmp=D;D=C;C=B;B=(B+rot)>>>0;A=tmp;
+  }
+  a0=(a0+A)>>>0;b0=(b0+B)>>>0;c0=(c0+C)>>>0;d0=(d0+D)>>>0;
+ }
+ const le=x=>{x>>>=0;let s="";for(let i=0;i<4;i++)s+=((x>>>(i*8))&255).toString(16).padStart(2,"0");return s};
+ return le(a0)+le(b0)+le(c0)+le(d0);
+}
+const dz=$('dz');dz.addEventListener('click',()=>$('fi').click());dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over')});dz.addEventListener('dragleave',()=>dz.classList.remove('over'));dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');hf(e.dataTransfer.files[0])});$('fi').addEventListener('change',e=>{if(e.target.files[0])hf(e.target.files[0])});
+function showRes(type,k){
+ const t=L[lg];let h='',cls='';const cr=k==='1h'?t.cr:'';
+ if(type==='src'){
+  $('re').style.display='none';$('re').innerHTML='';
+  $('selbox').style.display='block';
+  $('selbox').innerHTML='<b>▶ '+t.ready+'</b><br><span>'+t.pa+'</span><br><span>'+t.pad+'</span>'+(cr?'<br><span>'+cr+'</span>':'')+'<br><span>'+t.out+'<code>'+V[k].out+'</code></span>';
+ }else{
+  $('selbox').style.display='none';
+  if(type==='dst'){cls='wa';h='<h3>'+t.already+'</h3><p>'+TN(k)+'</p>'+(cr?'<p style="margin-top:6px;color:var(--dm);font-size:11px">'+cr+'</p>':'');}
+  else{cls='er';h='<h3>'+t.unk+'</h3><p>'+t.unkSub+'</p>';}
+  $('re').className='res '+cls;$('re').innerHTML=h;$('re').style.display='block';
+ }
+ _rk={type:type,k:k};
+}
+function hf(f){
+ $('ni').style.display='block';$('vn').textContent=f.name;$('vs').textContent=f.size.toLocaleString()+' B';$('vcrc').textContent='...';$('vd').textContent='...';
+ $('ap').disabled=true;$('dl').style.display='none';$('re').style.display='none';$('pw').style.display='none';$('selbox').style.display='none';$('lg').style.display='none';$('lg').innerHTML='';TB=null;SP=null;window._db=null;
+ const r=new FileReader();r.onload=e=>{
+  S=new Uint8Array(e.target.result);const c=crc32(S);$('vcrc').textContent=c.toString(16).toUpperCase().padStart(8,'0');
+  const db=DB.find(x=>x.c===c);window._db=db;const t=L[lg];
+  if(db){
+   const k=db.k;
+   $('vd').textContent=TN(k)+' · '+(db.s==='dst'?t.dst:t.src);$('vd').className=db.s==='dst'?'v y':'v';
+   if(db.s==='dst'){showRes('dst',k)}
+   else{SP=V[k];showRes('src',k);$('ap').disabled=false}
+  }else{$('vd').textContent=t.unknown;$('vd').className='v r';showRes('unknown',null)}
+ };r.readAsArrayBuffer(f);
+}
+async function inflate(d){
+ if(typeof DecompressionStream!=='undefined'){
+  const ds=new DecompressionStream('deflate-raw'),w=ds.writable.getWriter();w.write(d);w.close();
+  const rd=ds.readable.getReader(),ch=[];let tot=0;
+  while(true){const{done,value}=await rd.read();if(done)break;ch.push(value);tot+=value.length}
+  const o=new Uint8Array(tot);let off=0;for(const c of ch){o.set(c,off);off+=c.length}return o
+ }
+ throw new Error(L[lg].noinf);
+}
+$('ap').addEventListener('click',async()=>{
+ if(!S||!SP||!window._db)return;
+ const t=L[lg],k=window._db.k;
+ $('ap').disabled=true;$('lg').innerHTML='';log(t.apply,'ok');
+ try{
+  sp(10,t.read);const bin=atob(SP.d),by=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)by[i]=bin.charCodeAt(i);
+  if(String.fromCharCode(by[0],by[1],by[2],by[3])!=='XDF1')throw new Error(t.badfmt);
+  const vw=new DataView(by.buffer),ps=vw.getUint32(4,true),pt=vw.getUint32(8,true),sz=vw.getUint32(12,true),cs=vw.getUint32(16,true),cd=by.slice(20,20+cs);
+  if(crc32(S)!==ps)throw new Error(t.badcrc);
+  log(t.crcok,'ok');sp(25,t.unpack);
+  const xd=await inflate(cd);log(t.unpack+xd.length+'B','ok');sp(60,t.write);
+  const res=new Uint8Array(sz);
+  for(let i=0;i<sz;i++)res[i]=(i<S.length?S[i]:0)^(i<xd.length?xd[i]:0);
+  sp(90,t.ocrc+'');const oc=crc32(res);
+  log(t.ocrc+oc.toString(16).toUpperCase().padStart(8,'0'),'ii');
+  const md=md5hex(res);log(t.omd5+md,'ii');
+  if(oc!==pt)throw new Error(t.badout);
+  TB=new Blob([res],{type:'application/octet-stream'});sp(100,t.done);log(t.okmsg,'ok');$('dl').style.display='block';
+ }catch(e){log('✗ '+e.message,'er');$('ap').disabled=false;sp(0,t.fail)}
+});
+$('dl').addEventListener('click',()=>{
+ if(!TB||!window._db)return;
+ const a=document.createElement('a');a.href=URL.createObjectURL(TB);a.download=V[window._db.k].out;a.click();URL.revokeObjectURL(a.href);log(L[lg].dld,'ok')
+});
+function sl(l){
+ lg=l;
+ document.querySelectorAll('[data-i]').forEach(e=>{const k=e.getAttribute('data-i');if(L[l][k]!==undefined)e.innerHTML=L[l][k]});
+ document.querySelectorAll('.lsw button').forEach(b=>b.classList.remove('on'));$(l==='ja'?'bj':'bz').classList.add('on');
+ document.documentElement.lang=l==='ja'?'ja':'zh-CN';
+ document.title=l==='ja'?'SRW コンパクト アニメスキップパッチ V1':'SRW Compact 1 跳过动画补丁 V1';
+ if(_rk)showRes(_rk.type,_rk.k);
+ if(window._db){const t=L[l],db=window._db;$('vd').textContent=TN(db.k)+' · '+(db.s==='dst'?t.dst:t.src);}
+}
+sl('zh');
+</script>
+</body>
+</html>
