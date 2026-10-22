@@ -193,9 +193,9 @@ Covers the three-part game — Part 1 *Chijou Gekidou Hen*, Part 2 *Uchuu Gekish
 | Part 1 Japanese · 日版第1部 `Compact_2_1 Rev1` | 782877BC | B90AEDEF |
 | Part 2 Japanese · 日版第2部 `Compact_2_2 Rev4` | ECBB46DE | 4F7EC0DE |
 | Part 3 Japanese · 日版第3部 `Compact_2_3 Rev2` | 0B0F8981 | 0BEB9A34 |
-| Part 1 Chinese · 汉化版「地上激震篇 名称修复版」 | 11DDBB87 | CAED1842 |
-| Part 2 Chinese · 汉化版「宇宙激震篇 名称剧情补全版」 | 75AFC3F0 | 1D0C06C7 |
-| Part 3 Chinese · 汉化版「银河决战篇 V1.3汉化版」 | 42BEFC0E | 425AEFBB |
+| Part 1 Chinese · 汉化版「地上激震篇 v1.5汉化版」 | BE3CFC94 | 650C5F51 |
+| Part 2 Chinese · 汉化版「宇宙激震篇 v1.2汉化版」 | 28EEF4E7 | 404D31D0 |
+| Part 3 Chinese · 汉化版「银河决战篇 v1.4汉化版」 | 13D961B2 | 227DA01F |
 
 The page identifies ROMs by CRC32; ROMs already patched (output CRC) are recognized as "already patched" and never written twice.
 页面按 CRC32 自动识别；已是输出 CRC 的 ROM 会被识别为“已打补丁”，不会重复写入。

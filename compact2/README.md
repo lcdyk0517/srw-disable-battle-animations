@@ -4,6 +4,7 @@
 > 制作：**lcdyk**
 > 在线补丁页：<https://srw.cc.cd/compact2>
 > 本文覆盖 Compact 2 第 1/2/3 部日版与三个汉化版，共 6 个受支持版本。
+> 旧文档 `SRWC2_开关版_技术文档.md`、`B跳过动画V1_技术文档.md` 仅作为历史过程参考，地址与行为以本文和 `compact2/build_rom/build_rom.py` 为准。
 
 ## 1. 功能定义（V1）
 
@@ -30,9 +31,9 @@ OFF : 战斗开始 ──> 直接结算（无动画）
 | 1j | `Compact_2_1 Rev1` | `Super Robot Taisen Compact 2 - Dai-1-bu - Chijou Gekidou Hen (Japan).ws` | `Super Robot Taisen Compact 2 - Dai-1-bu - Chijou Gekidou Hen (Japan)(Skip).ws` | `af355adec937a9db1d447980bf85aa2e` | `981a72fad7c058a6312f12b36d146992` | `782877BC → B90AEDEF` |
 | 2j | `Compact_2_2 Rev4` | `Super Robot Taisen Compact 2 - Dai-2-bu - Uchuu Gekishin Hen (Japan) (Rev 4).ws` | `Super Robot Taisen Compact 2 - Dai-2-bu - Uchuu Gekishin Hen (Japan) (Rev 4)(Skip).ws` | `bb1cf0d7237d7ae2c8aac562fc62906d` | `7789c3189adac3ee9183eb60443befa6` | `ECBB46DE → 4F7EC0DE` |
 | 3j | `Compact_2_3 Rev2` | `Super Robot Taisen Compact 2 - Dai-3-bu - Ginga Kessen Hen (Japan) (Rev 2).ws` | `Super Robot Taisen Compact 2 - Dai-3-bu - Ginga Kessen Hen (Japan) (Rev 2)(Skip).ws` | `44f63dcb11c916df900a128a6f2e3839` | `cca7150ee0136c7c2e2b13f15198b08d` | `0B0F8981 → 0BEB9A34` |
-| 1h | `地上激震篇 名称修复版` | `第2次机器人大战-地上激震篇_汉化版.wsc` | `第2次机器人大战-地上激震篇_汉化版_跳过动画.ws` | `440f1eb64702f5b3b7777c6af35a6c2c` | `d1d101bf43e8b2513583d69d375a88e9` | `11DDBB87 → CAED1842` |
-| 2h | `宇宙激震篇 名称剧情补全版` | `第2次机器人大战-宇宙激震篇_汉化版.wsc` | `第2次机器人大战-宇宙激震篇_汉化版_跳过动画.ws` | `d3ecc55cda50f98dc7cdc1b0708b0e90` | `22c13214c958e0f36d5abbbe1f6eef45` | `75AFC3F0 → 1D0C06C7` |
-| 3h | `银河决战篇 V1.3汉化版` | `第2次机器人大战-银河决战篇_汉化版.wsc` | `第2次机器人大战-银河决战篇_汉化版_跳过动画.ws` | `725b2f61448eb7ed8a8cb3ece05366ec` | `aae713dae3f413c4c64dcee0ccc485c1` | `42BEFC0E → 425AEFBB` |
+| 1h | `地上激震篇 v1.5汉化版` | `第2次机器人大战-地上激震篇_汉化版_v1.5.wsc` | `第2次机器人大战-地上激震篇_汉化版_v1.5_跳过动画.ws` | `2ef9ee566a2810c72feb65d604c80f60` | `2e3e584cc480b9682d938b7bf28f748e` | `BE3CFC94 → 650C5F51` |
+| 2h | `宇宙激震篇 v1.2汉化版` | `第2次机器人大战-宇宙激震篇_汉化版_v1.2.wsc` | `第2次机器人大战-宇宙激震篇_汉化版_v1.2_跳过动画.ws` | `9caa73f1c18fa8b4f4808592199966a2` | `d0db660d72aeeb67f96f8133d7c5fc48` | `28EEF4E7 → 404D31D0` |
+| 3h | `银河决战篇 v1.4汉化版` | `第2次机器人大战-银河决战篇_汉化版_v1.4.wsc` | `第2次机器人大战-银河决战篇_汉化版_v1.4_跳过动画.ws` | `8901cf472fe5cff70c6df3d6a093fb08` | `ce10e69245edf37528e4ae9dbfcf5c10` | `13D961B2 → 227DA01F` |
 
 页面和构建器都只接受上表的源 MD5；已经是输出 MD5 的文件会被识别为“已打补丁”，不会重复写入。
 
@@ -122,7 +123,7 @@ jz  .orig
 | `0x3528A7` | 2B | 菜单绘制调用 1 的 far 地址：`F000:F400`（wrapperA） |
 | `0x3529C3` | 2B | 菜单绘制调用 2 的 far 地址：`F000:F400`（wrapperA） |
 | `0x352AB1` | 4B | 第 6 项标签调用从 `5000:0068` 改为 `F000:F600` |
-| `0x35F8F4`（2j）/ `0x35FFBD`（2h）/ `0x35F9CC`（3j、3h） | 8B | 原生 ON/OFF 字符串 |
+| `0x35F8F4`（2j）/ `0x35FFBD`（2h）/ `0x35F9CC`（3j）/ `0x35FC68`（3h v1.4） | 8B | 原生 ON/OFF 字符串 |
 | `0x36000E` | 2B | 系统菜单条目帧指针：`0xF000` |
 | `0x36F000` | 256B | 9×14 扩展帧 |
 | `0x3FF000` | 66B | M5：六重门控 + `XOR [0x700],1` + 原生关闭 |
@@ -194,7 +195,10 @@ OFF 字符串显式写入 `FF` 终止符，避免渲染器越过字符串末尾�
 | 1h | `0x35F95C` |
 | 2j | `0x35F8F4` |
 | 2h | `0x35FFBD` |
-| 3j / 3h | `0x35F9CC` |
+| 3j | `0x35F9CC` |
+| 3h | `0x35FC68` |
+
+3h v1.4 的新文本占用了原 `0x35F9CC`，因此 ON/OFF 字符串迁到 `0x35FC68`；`0x3FF600` wrapper 的字符串指针从 `F9CC/F9D0` 改为 `FC68/FC6C`。
 
 `0x3FF600` 的原生 wrapper 流程：
 
@@ -237,14 +241,14 @@ python compact2/build_rom/build_rom.py "<源 ROM>" [输出路径] [--force]
 python compact2/build_rom/build_rom.py "Super Robot Taisen Compact 2 - Dai-1-bu - Chijou Gekidou Hen (Japan).ws" --force
 python compact2/build_rom/build_rom.py "Super Robot Taisen Compact 2 - Dai-2-bu - Uchuu Gekishin Hen (Japan) (Rev 4).ws" --force
 python compact2/build_rom/build_rom.py "Super Robot Taisen Compact 2 - Dai-3-bu - Ginga Kessen Hen (Japan) (Rev 2).ws" --force
-python compact2/build_rom/build_rom.py "第2次机器人大战-地上激震篇_汉化版.wsc" --force
-python compact2/build_rom/build_rom.py "第2次机器人大战-宇宙激震篇_汉化版.wsc" --force
-python compact2/build_rom/build_rom.py "第2次机器人大战-银河决战篇_汉化版.wsc" --force
+python compact2/build_rom/build_rom.py "第2次机器人大战-地上激震篇_汉化版_v1.5.wsc" --force
+python compact2/build_rom/build_rom.py "第2次机器人大战-宇宙激震篇_汉化版_v1.2.wsc" --force
+python compact2/build_rom/build_rom.py "第2次机器人大战-银河决战篇_汉化版_v1.4.wsc" --force
 ```
 
 ### 8.2 重新生成网页补丁
 
-由本仓库外的生成器脚本完成（生成器未随仓库发布，生成结果已提交为 `index.html`）：
+由本仓库外的生成器脚本完成（生成器未随仓库发布，生成结果已提交为 `compact2/index.html`）：
 
 1. 按 MD5 校验六个源 ROM 和六个输出 ROM；
 2. 现场计算 XOR 差分并用 raw deflate 压缩；
@@ -253,16 +257,16 @@ python compact2/build_rom/build_rom.py "第2次机器人大战-银河决战篇_�
 
 ## 9. 网页补丁
 
-`index.html`（原 `patch_ws.html`）支持六个版本：
+`compact2/index.html`（原 `patch_ws.html`，在线地址 <https://srw.cc.cd/compact2>）支持六个版本，页面结构完全参照 `patch_r.html` / `patch.html`：
 
-- 中文 / 日本語界面切换；
-- 版本区只有一个标题“本补丁适配以下版本”，不再区分日版/汉化版；
-- 页面显示六个受支持版本标签（`Compact_2_1 Rev1`、`Compact_2_2 Rev4`、`Compact_2_3 Rev2`、`地上激震篇 名称修复版`、`宇宙激震篇 名称剧情补全版`、`银河决战篇 V1.3汉化版`）；
-- 页面常驻说明“战斗动画跳过 V1”：菜单第 6 项 ON/OFF，ON=正常播放动画+按 B 结束，OFF=默认跳过全部战斗动画；制作 lcdyk；
-- 拖入源 ROM 后按 CRC32 自动识别版本；
+- 顶部标题和中文 / 日本語切换；
+- 标题下方是 GitHub 仓库链接：`lcdyk0517/srw-disable-battle-animations`；
+- 拖放区下方直接列出六个受支持版本（不再单独做版本表）：`Compact_2_1 Rev1`、`Compact_2_2 Rev4`、`Compact_2_3 Rev2`、`地上激震篇 v1.5汉化版`、`宇宙激震篇 v1.2汉化版`、`银河决战篇 v1.4汉化版`；
+- 识别到源 ROM 后，在结果框和“▶ 准备应用补丁”框中显示 V1 功能说明：菜单第 6 项 ON/OFF，ON=正常播放动画+按 B 结束，OFF=默认跳过全部战斗动画；制作 lcdyk；
+- 拖入源 ROM 后按 CRC32 自动识别版本，版本名显示在“识别结果”中；
 - 校验源 CRC32 → 解压差分 → XOR 写入 → 校验输出 CRC32 和 MD5；
 - 下载文件名严格使用第 2 节的输出文件名；
-- 已打补丁的 ROM 会显示“已是跳过动画版”，不会再次应用。
+- 已打补丁的 ROM 会显示“已是跳过动画 V1 版”，不会再次应用。
 
 XDF1 格式：
 
@@ -279,13 +283,14 @@ raw-deflate(XOR 差分)
 
 ### 10.1 已完成的自动校验
 
-- 六个 `build_rom.py` 区域表逐一回放，输出 MD5 与第 2 节全部一致；
+- 六个 `build_rom_ws.py` 区域表逐一回放，输出 MD5 与第 2 节全部一致；
 - 六个 `XDF1` 页面差分逐一解码回放，输出 CRC32/MD5 与第 2 节全部一致；
 - 六个版本的 ON/OFF 字符串区域都显式包含 `FF` 终止符（`ON=91 90 FF FF`、`OFF=91 88 88 FF`）；
 - 无头浏览器实测：
   - `1j` 源 ROM 识别为 `Compact_2_1 Rev1`，页面应用后输出 `B90AEDEF / 981a72fad7c058a6312f12b36d146992`，文件名正确；
-  - `1h` 源 ROM 识别为 `地上激震篇 名称修复版`，页面应用后输出 `CAED1842 / d1d101bf43e8b2513583d69d375a88e9`，文件名正确；
-  - `2h` 源 ROM 识别为 `宇宙激震篇 名称剧情补全版`，页面正确显示“▶ 准备应用补丁”、V1 功能说明和“制作 lcdyk”；
+  - `1h` 源 ROM 识别为 `地上激震篇 v1.5汉化版`，页面应用后输出 `650C5F51 / 2e3e584cc480b9682d938b7bf28f748e`，文件名正确；
+  - `2h` 源 ROM 识别为 `宇宙激震篇 v1.2汉化版`，页面应用后输出 `404D31D0 / d0db660d72aeeb67f96f8133d7c5fc48`；
+  - `3h` 源 ROM 识别为 `银河决战篇 v1.4汉化版`，页面应用后输出 `227DA01F / ce10e69245edf37528e4ae9dbfcf5c10`；v1.4 新文本占用了原 ON/OFF 字符串区，字符串已迁到 `0x35FC68` 并同步改 wrapper 指针。
   - 日本語界面切换、已打补丁识别均正常。
 
 ### 10.2 建议的游戏内验收
@@ -324,4 +329,4 @@ raw-deflate(XOR 差分)
 - ON 路径的 B 跳过只在战斗动画演出段生效（`[0x134]==0x10`），过渡帧和结算帧不会误触。
 - OFF 路径不依赖按键，也不要求玩家按住 B。
 - 页面补丁和命令行构建器是同一套字节；两者输出 MD5 必须一致。
-- 若日后修改任何地址或字节，必须同步更新 `build_rom.py` 的注释、本文第 2 节哈希、`gen_patch_ws.py` 重新生成的页面，并重新跑六版本回放校验。
+- 若日后修改任何地址或字节，必须同步更新 `build_rom_ws.py` 的注释、本文第 2 节哈希、`gen_patch_ws.py` 重新生成的页面，并重新跑六版本回放校验。
