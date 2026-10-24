@@ -12,7 +12,7 @@ Battle animation skip patches for the **Super Robot Wars** series (スーパー�
 | Super Robot Wars A (GBA) · 超级机器人大战A | V5 (2026-10-13) | **<https://srw.cc.cd/srwa>** |
 | Super Robot Wars R (GBA) · 超级机器人大战R | V1 (2026-10-07) | **<https://srw.cc.cd/srwr>** |
 | Super Robot Wars Compact 1 (WonderSwan) · 超级机器人大战COMPACT 1 | V1 (2026-10-22) | **<https://srw.cc.cd/compact1>** |
-| Super Robot Wars Compact 2 (WonderSwan) · 超级机器人大战COMPACT 2 | V1 (2026-10-22) | **<https://srw.cc.cd/compact2>** |
+| Super Robot Wars Compact 2 (WonderSwan) · 超级机器人大战COMPACT 2 | V2 (2026-10-24) | **<https://srw.cc.cd/compact2>** |
 
 *This catalog keeps growing — more titles will be added.*
 *收录持续扩充中，更多作品陆续添加。*
@@ -23,7 +23,7 @@ Battle animation skip patches for the **Super Robot Wars** series (スーパー�
 
 1. Open the patch page of your game / 打开对应游戏的补丁页
 2. Drop your ROM (GBA or WonderSwan) onto the page (or click to choose a file) / 把 ROM（GBA / WonderSwan）拖入页面（或点击选择文件）
-3. The ROM is identified automatically by CRC32 — ROMs with older patches already applied are recognized and upgraded too / 页面按 CRC32 自动识别 ROM；已打过旧版补丁的 ROM 同样能识别并引导升级
+3. The ROM is identified automatically by CRC32. Upgrade support varies by page: Compact 2 V2 only recognizes V2 outputs and does not upgrade V1 patches / 页面按 CRC32 自动识别 ROM；旧补丁升级支持因页面而异：Compact 2 V2 只识别 V2 输出，不升级 V1 补丁
 4. Click **Apply patch**, then download the patched ROM / 点「应用补丁」，下载打好补丁的 ROM
 
 Everything runs locally in your browser — no ROM is ever uploaded. Please provide your own ROM file; this site does not distribute ROMs. Patch pages are available in Chinese and Japanese.
@@ -161,12 +161,12 @@ Full patch notes / 完整补丁说明: [compact1/README.md](compact1/README.md)
 
 ---
 
-## Super Robot Wars Compact 2 (WonderSwan) · 超级机器人大战COMPACT 2 — V1
+## Super Robot Wars Compact 2 (WonderSwan) · 超级机器人大战COMPACT 2 — V2
 
 **Patch page / 补丁页**: <https://srw.cc.cd/compact2> · **Patch notes / 补丁说明**: [compact2/README.md](compact2/README.md)
 
-Covers the three-part game — Part 1 *Chijou Gekidou Hen*, Part 2 *Uchuu Gekishin Hen*, Part 3 *Ginga Kessen Hen* — in Japanese and Chinese fan translations, six versions in total (4 MB `.ws` / `.wsc`).
-覆盖三部曲全部作品：第1部·地上激動編 / 第2部·宇宙激震編 / 第3部·銀河決戦篇，日版与汉化版共 6 个版本（4MB `.ws` / `.wsc`）。
+Covers the three-part game — Part 1 *Chijou Gekidou Hen*, Part 2 *Uchuu Gekishin Hen*, Part 3 *Ginga Kessen Hen* — in Japanese and Chinese fan translations, six versions in total (4 MB `.ws` / `.wsc`). The supported Chinese versions are 1h v2.1, 2h v1.5 and 3h v1.7.
+覆盖三部曲全部作品：第1部·地上激動編 / 第2部·宇宙激震編 / 第3部·銀河決戦篇，日版与汉化版共 6 个版本（4MB `.ws` / `.wsc`）；汉化版为 1h v2.1 / 2h v1.5 / 3h v1.7。
 
 ### Features / 功能
 
@@ -174,31 +174,33 @@ Covers the three-part game — Part 1 *Chijou Gekidou Hen*, Part 2 *Uchuu Gekish
 
 - New 6th entry `ON/OFF` in the system menu, rendered with the game's own native font (height and spacing match the other entries)
 - ON: battle animations play normally; hold **B** during an animation to end it right away and go into settlement
-- OFF: all battle animations are skipped by default — battle goes straight to settlement and back to the map
+- OFF: battles without support attacks switch instantly; battles with support use the native-frame run — about 1–3 seconds of white screen, then settlement with the same hit/damage/RNG as the unpatched game
 - Press **A** on the 6th entry to toggle and close the menu cleanly; press **B** to close without toggling
 - The toggle state is kept in RAM: reopening the menu shows the current state, and no ON/OFF glyphs leak into other menus
+- V2 only recognizes its six source versions and V2 outputs; it does not upgrade V1-patched ROMs. The V1 builder is kept at `compact2/build_rom/build_rom_v1.py` for manual legacy use; no V1 web page is provided
 
 **中文**
 
 - 系统菜单第 6 项显示原生 `ON / OFF`（用游戏原生字体渲染，字高字距与其他项一致）
 - ON：战斗动画正常播放；动画中按住 **B** 立即结束当前动画进入结算
-- OFF：默认跳过全部战斗动画，直接结算并回到地图
+- OFF：无援护战斗直接瞬切；有援护战斗走原生帧空跑，约 1–3 秒白屏后结算，命中/伤害/RNG 与原版一致
 - 第 6 项按 **A**：切换 ON/OFF 并干净关闭菜单；按 **B**：只关闭菜单，不切换
 - 开关状态保存在 RAM：重开菜单显示当前状态，其他菜单不会出现 ON/OFF 字形残留
+- V2 页面只识别上表六个源版本和 V2 输出，不提供 V1 补丁升级；V1 构建器保留在 `compact2/build_rom/build_rom_v1.py`，仅供手动处理旧版，网页不提供 V1 入口
 
 ### Supported ROMs / 支持的 ROM（CRC32: original → patched / 原版 → 打补丁后）
 
-| ROM | Original | Patched (V1) |
+| ROM | Original | Patched (V2) |
 |---|---|---|
-| Part 1 Japanese · 日版第1部 `Compact_2_1 Rev1` | 782877BC | B90AEDEF |
-| Part 2 Japanese · 日版第2部 `Compact_2_2 Rev4` | ECBB46DE | 4F7EC0DE |
-| Part 3 Japanese · 日版第3部 `Compact_2_3 Rev2` | 0B0F8981 | 0BEB9A34 |
-| Part 1 Chinese · 汉化版「地上激震篇 v1.5汉化版」 | BE3CFC94 | 650C5F51 |
-| Part 2 Chinese · 汉化版「宇宙激震篇 v1.2汉化版」 | 28EEF4E7 | 404D31D0 |
-| Part 3 Chinese · 汉化版「银河决战篇 v1.4汉化版」 | 13D961B2 | 227DA01F |
+| Part 1 Japanese · 日版第1部 `Compact_2_1 Rev1` | 782877BC | E7F55556 |
+| Part 2 Japanese · 日版第2部 `Compact_2_2 Rev4` | ECBB46DE | D4387C55 |
+| Part 3 Japanese · 日版第3部 `Compact_2_3 Rev2` | 0B0F8981 | DA3BCFEF |
+| Part 1 Chinese · 汉化版「地上激震篇 v2.1」 | B044A244 | F4F2D455 |
+| Part 2 Chinese · 汉化版「宇宙激震篇 v1.5」 | BB4912DA | 48AC6B66 |
+| Part 3 Chinese · 汉化版「银河决战篇 v1.7」 | 00772136 | D1436758 |
 
-The page identifies ROMs by CRC32; ROMs already patched (output CRC) are recognized as "already patched" and never written twice.
-页面按 CRC32 自动识别；已是输出 CRC 的 ROM 会被识别为“已打补丁”，不会重复写入。
+The page identifies ROMs by CRC32; V2 outputs are recognized as "already patched" and never written twice. V1-patched outputs are not upgraded.
+页面按 CRC32 自动识别；V2 输出会被识别为“已打补丁”，不会重复写入；不升级 V1 补丁输出。
 
 Full patch notes (address tables for both engine families, verification) / 完整补丁说明（两个引擎家族的地址表、校验）: [compact2/README.md](compact2/README.md)
 
@@ -224,9 +226,9 @@ Full patch notes (address tables for both engine families, verification) / 完�
 │   ├── README.md    patch notes V1 / 补丁说明 V1
 │   └── build_rom/   build_rom.py (3-ROM build, MD5-verified) / 构建脚本
 └── compact2/        Super Robot Wars Compact 2 · 超级机器人大战COMPACT 2 (WonderSwan)
-    ├── index.html   online patcher (6 versions, zh/ja UI) / 在线补丁工具
-    ├── README.md    patch notes V1 (both engine families) / 补丁说明 V1
-    └── build_rom/   build_rom.py (6-ROM build, MD5-identified) / 构建脚本
+    ├── index.html   online patcher (V2, 6 versions, zh/ja UI) / 在线补丁工具
+    ├── README.md    patch notes V2 (both engine families) / 补丁说明 V2
+    └── build_rom/   build_rom_v1.py (legacy) + build_rom_v2.py (V2) / 构建脚本
 ```
 
 Each game lives in its own folder; new titles are added as new folders and a row in the catalog above.

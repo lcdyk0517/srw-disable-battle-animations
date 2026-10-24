@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# V1 legacy builder (manual use only; the web page is V2).
 """SRW Compact 2 跳过动画 (Skip Animation) 自包含补丁构建器.
 
 支持 6 个源版本，按源 MD5 自动识别；只读取源 ROM，补丁字节全部内嵌。
@@ -233,7 +234,7 @@ def main(argv):
         print(__doc__); return 0
     src_path=args[0]
     if len(args)>2:
-        print("用法: python build_rom_ws.py <source.ws|.wsc> [output] [--force]"); return 2
+        print("用法: python build_rom_v1.py <source.ws|.wsc> [output] [--force]"); return 2
     data=open(src_path,"rb").read()
     key,state=detect(data)
     if key is None:
