@@ -12,7 +12,7 @@ Battle animation skip patches for the **Super Robot Wars** series (スーパー�
 | Super Robot Wars A (GBA) · 超级机器人大战A | V5 (2026-10-13) | **<https://srw.cc.cd/srwa>** |
 | Super Robot Wars R (GBA) · 超级机器人大战R | V1 (2026-10-07) | **<https://srw.cc.cd/srwr>** |
 | Super Robot Wars Compact 1 (WonderSwan) · 超级机器人大战COMPACT 1 | V1 (2026-10-22) | **<https://srw.cc.cd/compact1>** |
-| Super Robot Wars Compact 2 (WonderSwan) · 超级机器人大战COMPACT 2 | V2 (2026-10-24) | **<https://srw.cc.cd/compact2>** |
+| Super Robot Wars Compact 2 (WonderSwan) · 超级机器人大战COMPACT 2 | V2.1 (2026-11-05) | **<https://srw.cc.cd/compact2>** |
 
 *This catalog keeps growing — more titles will be added.*
 *收录持续扩充中，更多作品陆续添加。*
@@ -161,7 +161,7 @@ Full patch notes / 完整补丁说明: [compact1/README.md](compact1/README.md)
 
 ---
 
-## Super Robot Wars Compact 2 (WonderSwan) · 超级机器人大战COMPACT 2 — V2
+## Super Robot Wars Compact 2 (WonderSwan) · 超级机器人大战COMPACT 2 — V2.1
 
 **Patch page / 补丁页**: <https://srw.cc.cd/compact2> · **Patch notes / 补丁说明**: [compact2/README.md](compact2/README.md)
 
@@ -174,33 +174,35 @@ Covers the three-part game — Part 1 *Chijou Gekidou Hen*, Part 2 *Uchuu Gekish
 
 - New 6th entry `ON/OFF` in the system menu, rendered with the game's own native font (height and spacing match the other entries)
 - ON: battle animations play normally; hold **B** during an animation to end it right away and go into settlement
-- OFF: battles without support attacks switch instantly; battles with support use the native-frame run — about 1–3 seconds of white screen, then settlement with the same hit/damage/RNG as the unpatched game
+- OFF: battles without support use the fast script pump (about 10 frames); battles with support use native frames — about 1.7 seconds of white screen, then settlement with the same hit/damage/EXP as the unpatched game
 - Press **A** on the 6th entry to toggle and close the menu cleanly; press **B** to close without toggling
 - The toggle state is kept in RAM: reopening the menu shows the current state, and no ON/OFF glyphs leak into other menus
-- V2 only recognizes its six source versions and V2 outputs; it does not upgrade V1-patched ROMs. The V1 builder is kept at `compact2/build_rom/build_rom_v1.py` for manual legacy use; no V1 web page is provided
+- V2.1 fixes the D1/D2 unit-structure entry used by counterattacks and prevents support damage loss / sprite corruption
+- The page covers the three Japanese originals and the legacy Chinese 1h/2h/3h versions; current `srw-chinese-localization` Chinese builds use `build_rom_cn.py`
 
 **中文**
 
 - 系统菜单第 6 项显示原生 `ON / OFF`（用游戏原生字体渲染，字高字距与其他项一致）
 - ON：战斗动画正常播放；动画中按住 **B** 立即结束当前动画进入结算
-- OFF：无援护战斗直接瞬切；有援护战斗走原生帧空跑，约 1–3 秒白屏后结算，命中/伤害/RNG 与原版一致
+- OFF：无援护战斗走快速脚本泵（约 10 帧）；有援护战斗逐帧原生结算，约 1.7 秒白屏后结算，命中/伤害/经验与原版一致
 - 第 6 项按 **A**：切换 ON/OFF 并干净关闭菜单；按 **B**：只关闭菜单，不切换
 - 开关状态保存在 RAM：重开菜单显示当前状态，其他菜单不会出现 ON/OFF 字形残留
-- V2 页面只识别上表六个源版本和 V2 输出，不提供 V1 补丁升级；V1 构建器保留在 `compact2/build_rom/build_rom_v1.py`，仅供手动处理旧版，网页不提供 V1 入口
+- V2.1 修正 D1/D2 反击战单位结构例程入口，并修复援护伤害丢失/花屏
+- 网页覆盖三部日版与旧汉化 1h/2h/3h；当前 `srw-chinese-localization` 汉化版用 `build_rom_cn.py` 构建
 
 ### Supported ROMs / 支持的 ROM（CRC32: original → patched / 原版 → 打补丁后）
 
-| ROM | Original | Patched (V2) |
+| ROM | Original | Patched (V2.1) |
 |---|---|---|
-| Part 1 Japanese · 日版第1部 `Compact_2_1 Rev1` | 782877BC | E7F55556 |
-| Part 2 Japanese · 日版第2部 `Compact_2_2 Rev4` | ECBB46DE | D4387C55 |
-| Part 3 Japanese · 日版第3部 `Compact_2_3 Rev2` | 0B0F8981 | DA3BCFEF |
+| Part 1 Japanese · 日版第1部 `Compact_2_1 Rev1` | 782877BC | 094DB55A |
+| Part 2 Japanese · 日版第2部 `Compact_2_2 Rev4` | ECBB46DE | 29C7107C |
+| Part 3 Japanese · 日版第3部 `Compact_2_3 Rev2` | 0B0F8981 | 7C75B29C |
 | Part 1 Chinese · 汉化版「地上激震篇 v2.1」 | B044A244 | F4F2D455 |
 | Part 2 Chinese · 汉化版「宇宙激震篇 v1.5」 | BB4912DA | 48AC6B66 |
 | Part 3 Chinese · 汉化版「银河决战篇 v1.7」 | 00772136 | D1436758 |
 
-The page identifies ROMs by CRC32; V2 outputs are recognized as "already patched" and never written twice. V1-patched outputs are not upgraded.
-页面按 CRC32 自动识别；V2 输出会被识别为“已打补丁”，不会重复写入；不升级 V1 补丁输出。
+The page identifies ROMs by CRC32; V2.1 outputs are recognized as "already patched" and never written twice. V1-patched outputs are not upgraded.
+页面按 CRC32 自动识别；V2.1 输出会被识别为“已打补丁”，不会重复写入；不升级 V1 补丁输出。
 
 Full patch notes (address tables for both engine families, verification) / 完整补丁说明（两个引擎家族的地址表、校验）: [compact2/README.md](compact2/README.md)
 
@@ -226,9 +228,9 @@ Full patch notes (address tables for both engine families, verification) / 完�
 │   ├── README.md    patch notes V1 / 补丁说明 V1
 │   └── build_rom/   build_rom.py (3-ROM build, MD5-verified) / 构建脚本
 └── compact2/        Super Robot Wars Compact 2 · 超级机器人大战COMPACT 2 (WonderSwan)
-    ├── index.html   online patcher (V2, 6 versions, zh/ja UI) / 在线补丁工具
-    ├── README.md    patch notes V2 (both engine families) / 补丁说明 V2
-    └── build_rom/   build_rom_v1.py (legacy) + build_rom_v2.py (V2) / 构建脚本
+    ├── index.html   online patcher (V2.1, JP + legacy CN, zh/ja UI) / 在线补丁工具
+    ├── README.md    patch notes V2.1 (JP/CN, address tables) / 补丁说明 V2.1
+    └── build_rom/   build_rom_v1.py (legacy) + build_rom_v2.py (JP) + build_rom_cn.py (CN) / 构建脚本
 ```
 
 Each game lives in its own folder; new titles are added as new folders and a row in the catalog above.

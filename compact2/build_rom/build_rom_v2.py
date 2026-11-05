@@ -199,6 +199,9 @@ GAMES = {
         hook1_next_ip=0xB2BE,      # native 路径执行完回到 hook1+8
         native=(0xE000, 0xF4E0),   # 原生入口：mov si,0; lcall E000:F4E0
         hstub=0x3EFC60, hstub_ip=0xFC60,   # 空跑 stub（bank3E 空区）
+        unit_ptr=(0xF000, 0x5136),         # D1 单位结构例程（含 push ax/dx 序言，0x3A/0x2279）
+        # 战斗帧按 [0x887] 在 E000:3E20 / E000:5F5C 间切换；泵脚本时同步分流
+        script=(0xE000, 0x3E20), script2=(0xE000, 0x5F5C), sel=0x887, wait=0x847,
     ),
     "g2": dict(
         int_ff=True,       # 第2部：同第1部（tick 0x7E7 / 分发器 F000:056C）
@@ -208,27 +211,42 @@ GAMES = {
         hook1=0x3C2C12, hook1_ip=0x2C12, hook1_next_ip=0x2C1A,
         native=(0xE000, 0xF552),
         hstub=0x3C7C80, hstub_ip=0x7C80,
+        unit_ptr=(0xF000, 0x5204),         # D2 单位结构例程（含 push ax/dx 序言，0x3A/0x1515）
+        # 战斗帧按 [0x889] 在 E000:46A0 / E000:691C 间切换；泵脚本时同步分流
+        script=(0xE000, 0x46A0), script2=(0xE000, 0x691C), sel=0x889, wait=0x847,
     ),
     "g3": dict(
-        int_ff=True,       # 第3部：同第1部（tick 0x7E7 / 分发器 F000:056C）
+        int_ff=True,       # 第3部：直接泵脚本解释器（见 script/wait）
         disp=0x056C,
         flag=0x700,
         tick=0x7E7,
         hook1=0x3C6512, hook1_ip=0x6512, hook1_next_ip=0x651A,
         native=(0xE000, 0xDF9A),
         hstub=0x3CB560, hstub_ip=0xB560,
+        # D3 战斗帧 C000:6568 每帧 lcall E000:37B0；直接连续调用它并清
+        # [0x847] 等待计数，可跳过动画帧把整段援护脚本跑完（约 0.7s）。
+        script=(0xE000, 0x37B0), script2=(0xE000, 0x5A7C), sel=0x889,
+        wait=0x847,
+        unit_ptr=(0xF000, 0x5224),         # D3 单位结构例程（0x3A/0x1515）
     ),
 }
 
 
 
-def hook_stub_int_ff(flag, tick, disp, native_seg, native_off, hook_next_ip, stub_ip):
-    """第1部援护战：原生帧中断空跑版。
+def hook_stub_int_ff(flag, tick, disp, native_seg, native_off, hook_next_ip, stub_ip,
+                     script=None, script2=None, sel=None, wait=None,
+                     unit_ptr=None, push_unit_args=False):
+    """援护战空跑 stub。
 
-    有援护且要跳过时，先执行当前帧，然后反复 `int 0x25`（定时器帧中断）。
-    每次中断就是完整的一帧原生逻辑（LCG、[0x137]、命令队列、脚本解释器），
-    解释器自己把脚本 tick 推到 13 并原生结算援护；到 tick 13 立即回地图。
-    不预测帧数、不改 RNG，所以命中/伤害与完整播放逐位一致。
+    有援护且要跳过时先跑当前帧，然后：
+      - 普通引擎（g1/g2）：反复 `int 0x25`，每次中断是一帧完整原生逻辑
+        （LCG/[0x137]/命令队列/解释器），解释器自己把 tick 推到 13 并原生
+        结算援护；到 tick 13 立即回地图。
+      - g3（给定 script/wait）：战斗帧每帧本来只调一次 E000:37B0 解释器，
+        这里连续直接调用并清 [0x847] 等待计数，跳过动画帧把整段援护脚本
+        泵完；tick 过 13 且模式离开 0x10/0x11（脚本自然结束，含后续
+        清 [0x4B3]、死亡检查）后再回地图。白屏约 0.7s（原约 3s）。
+    两种方式都跑原生结算代码，伤害/经验与完整播放一致。
     无援护仍保持 V1（OFF/按住 B 立即瞬切）。"""
     a = Asm()
     a.put(bytes.fromhex("36f606a00001"))              # test byte ss:[0x00A0],1 (空跑重入?)
@@ -243,30 +261,109 @@ def hook_stub_int_ff(flag, tick, disp, native_seg, native_off, hook_next_ip, stu
     a.j8(0x75, "sim")
     a.j16(0xE9, "native")
     a.L("nosup")
-    a.put(bytes((0x36, 0xF6, 0x06, flag & 0xFF, flag >> 8, 0x01)))
-    a.j8(0x74, "ns1")
-    a.j16(0xE9, "exit")
-    a.L("ns1")
-    a.put(bytes.fromhex("b040e6b5e5b5a808"))
-    a.j8(0x74, "ns2")
-    a.j16(0xE9, "exit")
-    a.L("ns2")
-    a.j16(0xE9, "native")
+    if unit_ptr:
+        # 无援护时也要区分“玩家发起”与“反击战”。反击战攻方是敌方
+        # （[0x480] 的单位结构 +0x07 bit4），瞬切会跳过敌方攻击/反击结算并留下白屏，
+        # 这种情况改走脚本泵，把战斗正常跑完再回地图。
+        a.put(bytes((0x36, 0xF6, 0x06, flag & 0xFF, flag >> 8, 0x01)))
+        a.j8(0x74, "ns1")
+        a.j16(0xE9, "chk")
+        a.L("ns1")
+        a.put(bytes.fromhex("b040e6b5e5b5a808"))
+        a.j8(0x74, "ns2")
+        a.j16(0xE9, "chk")
+        a.L("ns2")
+        a.j16(0xE9, "native")
+        a.L("chk")
+        a.put(bytes.fromhex("36a18004"))              # mov ax,ss:[0x480] 攻方
+        if push_unit_args:
+            a.put(bytes((0x50, 0x52)))                # push ax / push dx（D1/D2 例程结尾会 pop dx/ax）
+        a.put(bytes((0x9A, unit_ptr[1] & 0xFF, unit_ptr[1] >> 8, unit_ptr[0] & 0xFF, unit_ptr[0] >> 8)))  # lcall 单位结构例程
+        a.put(bytes.fromhex("26f6460710"))            # test byte es:[bp+0x07],0x10（敌方标志）
+        a.j8(0x74, "chk_exit")
+        a.j16(0xE9, "sim")                            # 敌方先攻（反击战）→ 脚本泵
+        a.L("chk_exit")
+        a.j16(0xE9, "exit")
+    else:
+        a.put(bytes((0x36, 0xF6, 0x06, flag & 0xFF, flag >> 8, 0x01)))
+        a.j8(0x74, "ns1")
+        a.j16(0xE9, "exit")
+        a.L("ns1")
+        a.put(bytes.fromhex("b040e6b5e5b5a808"))
+        a.j8(0x74, "ns2")
+        a.j16(0xE9, "exit")
+        a.L("ns2")
+        a.j16(0xE9, "native")
     a.L("sim")
     a.put(bytes.fromhex("36c606a00001"))              # guard=1
     a.put(bytes.fromhex("36a10001"))                  # 保存显示控制 [0x100]
     a.put(bytes((0x50,)))                             # push ax
+    if script:
+        a.put(bytes((0x55, 0x51)))                    # push bp / push cx（保存调用方寄存器）
     a.put(bytes.fromhex("36c70600010000"))            # [0x100]=0（空跑期间关显示，避免花屏）
     a.put(bytes((0x9A, disp & 0xFF, disp >> 8, 0x00, 0xF0)))  # 当前帧：lcall F000:disp（1部 0572 / 2·3部 056C）
     a.put(bytes((0x36, 0x83, 0x3E, tick & 0xFF, tick >> 8, 0x0D)))  # cmp ss:[tick],13
-    a.j8(0x73, "done")
-    a.L("loop")
+    a.j8(0x72, "pump_go")                             # jb：未到结算帧
+    a.j16(0xE9, "done")
+    a.L("pump_go")
+    if script:
+        # 援护战直接泵脚本会漏掉援护单位流程，必须退回逐帧 int 0x25；
+        # 无援护才走快速脚本泵。
+        a.put(bytes.fromhex("36f606b30402"))          # test byte ss:[0x4B3],2（援护）
+        a.j8(0x75, "slowpump")
+        seg, off = script
+        a.put(bytes.fromhex("36c70635010001"))        # [0x135]=1：泵脚本期间封锁异步 ISR 重入
+        a.put(bytes.fromhex("bd0004"))                # mov bp,0x0400（帧数上限保护）
+        a.L("outer")
+        a.put(bytes.fromhex("b91000"))                # mov cx,0x0010（每帧最多直接泵 16 步）
+        a.L("floop")
+        a.put(bytes((0x36, 0xC7, 0x06, wait & 0xFF, wait >> 8, 0x00, 0x00)))  # [wait]=0
+        a.put(bytes((0x51, 0x55)))                    # push cx / push bp
+        if script2:
+            # 真实战斗帧按 [sel] 在两种解释器之间切换，泵也必须跟随
+            a.put(bytes.fromhex("36833E") + sel.to_bytes(2, "little") + b"\x00")
+            a.j8(0x75, "pump2")
+            a.put(bytes((0x9A, off & 0xFF, off >> 8, seg & 0xFF, seg >> 8)))
+            a.j16(0xE9, "pump_done")
+            a.L("pump2")
+            s2seg, s2off = script2
+            a.put(bytes((0x9A, s2off & 0xFF, s2off >> 8, s2seg & 0xFF, s2seg >> 8)))
+            a.L("pump_done")
+        else:
+            a.put(bytes((0x9A, off & 0xFF, off >> 8, seg & 0xFF, seg >> 8)))  # 泵一步脚本解释器
+        a.put(bytes((0x5D, 0x59)))                    # pop bp / pop cx
+        a.put(bytes((0x36, 0xC7, 0x06, wait & 0xFF, wait >> 8, 0x00, 0x00)))  # [wait]=0
+        a.put(bytes((0x36, 0x83, 0x3E, tick & 0xFF, tick >> 8, 0x15)))
+        a.j8(0x72, "after21")                         # jb：未到 tick 21
+        a.j16(0xE9, "done")                           # 脚本到 tick 21（收尾完成）
+        a.L("after21")
+        a.put(bytes((0x36, 0x83, 0x3E, tick & 0xFF, tick >> 8, 0x0D)))
+        a.j8(0x72, "advance")                         # 未到结算帧，继续泵
+        a.put(bytes.fromhex("368a063301"))            # mov al,ss:[0x133]
+        a.put(bytes.fromhex("3c10"))
+        a.j8(0x74, "advance")                         # 模式 0x10：动画中
+        a.put(bytes.fromhex("3c11"))
+        a.j8(0x74, "advance")                         # 模式 0x11：动画中
+        a.j16(0xE9, "done")                           # 模式已离开 → 脚本自然结束
+        a.L("advance")
+        a.put(bytes.fromhex("49"))                    # dec cx
+        a.j8(0x75, "floop")
+        a.put(bytes.fromhex("36c70635010000"))        # 本轮泵完：[0x135]=0 放行一帧原生逻辑
+        a.put(bytes((0xCD, 0x25)))                    # int 0x25（定时器 ISR = 1 帧）
+        a.put(bytes.fromhex("36c70635010001"))        # 再次封锁异步 ISR
+        a.put(bytes.fromhex("4d"))                    # dec bp
+        a.j8(0x75, "outer")
+        a.j16(0xE9, "done")
+        a.L("slowpump")
+    a.L("sloop")
     a.put(bytes.fromhex("36c70600010000"))            # 每帧保持显示关闭
     a.put(bytes.fromhex("36c70635010000"))            # [0x135]=0（允许中断完整执行）
     a.put(bytes((0xCD, 0x25)))                        # int 0x25（定时器 ISR = 1 帧）
     a.put(bytes((0x36, 0x83, 0x3E, tick & 0xFF, tick >> 8, 0x0D)))
-    a.j8(0x72, "loop")
+    a.j8(0x72, "sloop")
     a.L("done")
+    if script:
+        a.put(bytes((0x59, 0x5D)))                    # pop cx / pop bp
     a.put(bytes((0x58,)))                             # pop ax
     a.put(bytes.fromhex("36a30001"))                  # 恢复显示控制
     a.put(bytes.fromhex("36c606a00000"))              # guard=0
@@ -289,7 +386,9 @@ def hook_stub_int_ff(flag, tick, disp, native_seg, native_off, hook_next_ip, stu
 def combat_regions(g):
     d = GAMES[g]
     hs = hook_stub_int_ff(d["flag"], d["tick"], d["disp"], d["native"][0], d["native"][1],
-                          d["hook1_next_ip"], d["hstub_ip"])
+                          d["hook1_next_ip"], d["hstub_ip"],
+                          script=d.get("script"), wait=d.get("wait"),
+                          unit_ptr=d.get("unit_ptr"))
     return [
         (d["hook1"], _near(d["hook1_ip"], d["hstub_ip"]) + b"\x90\x90",
          "战斗每帧 hook：把入口的 mov si,0 换成 near jmp → 援护空跑 stub"),
