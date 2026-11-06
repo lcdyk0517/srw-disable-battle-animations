@@ -117,9 +117,9 @@ OFF : 无援护 → 快速脚本泵（≈10 帧）
 
 | 作品 | 宋体源 CRC → 跳过版 | 融合像素源 CRC → 跳过版 |
 |---|---|---|
-| D1 | `638FB3A3 → 3BE945A7` | `E94EFCB0 → B1280AB4` |
-| D2 | `C553C5D1 → F5FEF06F` | `6AAEDFB4 → 3B4157D8` |
-| D3 | `C86C6227 → 573B5C28` | `A197D5C6 → 3EC0EBC9` |
+| D1 | `12802776 → 4AE6D172` | `98416865 → C0279E61` |
+| D2 | `C7E41A30 → F7492F8E` | `68190055 → 39F68839` |
+| D3 | `C8508F2A → 5707B125` | `A1AB38CB → 3EFC06C4` |
 
 ```bash
 # 汉化版：--build-root 指向 srw-chinese-localization/compact2/assets
